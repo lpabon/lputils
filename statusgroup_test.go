@@ -74,3 +74,57 @@ func TestStatusGroupFailure(t *testing.T) {
 	tests.Assert(t, err.Error() == "Err: 90", err)
 
 }
+
+func TestStatusGroupAbort(t *testing.T) {
+	s := NewStatusGroup()
+	var last int
+
+	for i := 1; i < 100; i++ {
+
+		s.Add(1)
+		go func(value int) {
+			defer s.Done()
+			time.Sleep(time.Millisecond * 1 * time.Duration(value))
+			for !s.Abort() {
+				if value%10 == 0 {
+					s.Err(errors.New(fmt.Sprintf("Err: %v", value)))
+					last = value
+				}
+			}
+
+		}(i)
+
+	}
+
+	err := s.Result()
+
+	tests.Assert(t, err != nil)
+	tests.Assert(t, err.Error() == "Err: 10", err)
+	tests.Assert(t, last == 10)
+}
+
+func TestResultFailFast(t *testing.T) {
+	s := NewStatusGroup()
+	var last int
+
+	for i := 1; i < 100; i++ {
+
+		s.Add(1)
+		go func(value int) {
+			defer s.Done()
+			time.Sleep(time.Millisecond * 1 * time.Duration(value))
+			if value%10 == 0 {
+				s.Err(errors.New(fmt.Sprintf("Err: %v", value)))
+				last = value
+			}
+
+		}(i)
+
+	}
+
+	err := s.ResultFailFast()
+
+	tests.Assert(t, err != nil)
+	tests.Assert(t, err.Error() == "Err: 10", err)
+	tests.Assert(t, last == 10)
+}

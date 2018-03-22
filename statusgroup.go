@@ -24,6 +24,8 @@ type StatusGroup struct {
 	wg      sync.WaitGroup
 	results chan error
 	err     error
+	abort   bool
+	l       sync.Mutex
 }
 
 // Create a new goroutine error status collector
@@ -32,6 +34,12 @@ func NewStatusGroup() *StatusGroup {
 	s.results = make(chan error, 1)
 
 	return s
+}
+
+func (s *StatusGroup) Abort() bool {
+	s.l.Lock()
+	defer s.l.Unlock()
+	return s.abort
 }
 
 // Adds to the number of goroutines it should wait
@@ -46,6 +54,9 @@ func (s *StatusGroup) Done() {
 
 // Goroutine can return an error back to caller
 func (s *StatusGroup) Err(err error) {
+	s.l.Lock()
+	s.abort = true
+	s.l.Unlock()
 	s.results <- err
 }
 
@@ -54,10 +65,20 @@ func (s *StatusGroup) Err(err error) {
 // This function must be called last after the last
 // s.Register() function
 func (s *StatusGroup) Result() error {
+	return s.wait(false)
+}
+
+//Cannot be called with Result() and vice-versa
+func (s *StatusGroup) ResultFailFast() error {
+	return s.wait(true)
+}
+
+func (s *StatusGroup) wait(failOnFirstError bool) error {
 
 	// This goroutine will wait until all
 	// other privously spawned goroutines finish.
 	// Once they finish, it will close the channel
+
 	go func() {
 		s.wg.Wait()
 		close(s.results)
@@ -68,6 +89,9 @@ func (s *StatusGroup) Result() error {
 		// Only save the last one
 		if err != nil {
 			s.err = err
+			if failOnFirstError {
+				return s.err
+			}
 		}
 	}
 
