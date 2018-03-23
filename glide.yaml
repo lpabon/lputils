@@ -1,4 +1,4 @@
-package: github.com/heketi/utils
+package: github.com/lpabon/lputils
 import:
 - package: github.com/lpabon/godbc
 - package: golang.org/x/crypto
