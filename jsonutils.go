@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2015 The heketi Authors
+// Copyright (c) 2015 Luis Pabón <lpabon@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-package utils
+package lputils
 
 import (
 	"encoding/json"
