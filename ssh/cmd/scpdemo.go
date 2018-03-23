@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/heketi/utils/ssh"
+	"github.com/lpabon/lputils/ssh"
 )
 
 func runDemo(s ssh.SshExecutor) {

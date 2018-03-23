@@ -17,8 +17,9 @@
 package utils
 
 import (
-	"github.com/heketi/tests"
 	"testing"
+
+	"github.com/lpabon/lputils/tests"
 )
 
 func TestNewStringSet(t *testing.T) {

@@ -17,7 +17,7 @@
 package utils
 
 import (
-	"github.com/heketi/tests"
+	"github.com/lpabon/lputils/tests"
 	"sort"
 	"testing"
 )

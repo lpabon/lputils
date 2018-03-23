@@ -20,9 +20,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/heketi/tests"
 	"strings"
 	"testing"
+
+	"github.com/lpabon/lputils/tests"
 )
 
 func TestLogLevel(t *testing.T) {

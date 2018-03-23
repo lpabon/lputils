@@ -19,9 +19,10 @@ package utils
 import (
 	"errors"
 	"fmt"
-	"github.com/heketi/tests"
 	"testing"
 	"time"
+
+	"github.com/lpabon/lputils/tests"
 )
 
 func TestNewStatusGroup(t *testing.T) {
