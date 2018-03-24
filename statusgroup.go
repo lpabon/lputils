@@ -36,7 +36,7 @@ func NewStatusGroup() *StatusGroup {
 	return s
 }
 
-func (s *StatusGroup) Abort() bool {
+func (s *StatusGroup) Aborted() bool {
 	s.l.Lock()
 	defer s.l.Unlock()
 	return s.abort
@@ -55,8 +55,11 @@ func (s *StatusGroup) Done() {
 // Goroutine can return an error back to caller
 func (s *StatusGroup) Err(err error) {
 	s.l.Lock()
-	s.abort = true
+	if err != nil {
+		s.abort = true
+	}
 	s.l.Unlock()
+
 	s.results <- err
 }
 

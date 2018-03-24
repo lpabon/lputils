@@ -64,7 +64,6 @@ func TestStatusGroupFailure(t *testing.T) {
 			if value%10 == 0 {
 				s.Err(errors.New(fmt.Sprintf("Err: %v", value)))
 			}
-
 		}(i)
 
 	}
@@ -73,24 +72,19 @@ func TestStatusGroupFailure(t *testing.T) {
 
 	tests.Assert(t, err != nil)
 	tests.Assert(t, err.Error() == "Err: 90", err)
-
 }
 
-func TestStatusGroupAbort(t *testing.T) {
+func TestStatusGroupAbortNoError(t *testing.T) {
 	s := NewStatusGroup()
-	var last int
 
-	for i := 1; i < 100; i++ {
+	for i := 0; i < 100; i++ {
 
 		s.Add(1)
 		go func(value int) {
 			defer s.Done()
-			time.Sleep(time.Millisecond * 1 * time.Duration(value))
-			for !s.Abort() {
-				if value%10 == 0 {
-					s.Err(errors.New(fmt.Sprintf("Err: %v", value)))
-					last = value
-				}
+			for j := 0; j < 10 && !s.Aborted(); j++ {
+				time.Sleep(time.Millisecond * 1 * time.Duration(value))
+				s.Err(nil)
 			}
 
 		}(i)
@@ -98,15 +92,46 @@ func TestStatusGroupAbort(t *testing.T) {
 	}
 
 	err := s.Result()
+	tests.Assert(t, err == nil)
+}
+
+func TestStatusGroupAbort(t *testing.T) {
+	s := NewStatusGroup()
+
+	wait := make(chan bool)
+	go func() {
+		wait <- true
+		s.Err(fmt.Errorf("ERROR"))
+	}()
+	<-wait
+
+	for i := 0; i < 100; i++ {
+		s.Add(1)
+		go func() {
+			defer s.Done()
+			if !s.Aborted() {
+				panic("Should not be here")
+			} else {
+				s.Err(nil)
+			}
+		}()
+	}
+
+	err := s.Result()
 
 	tests.Assert(t, err != nil)
-	tests.Assert(t, err.Error() == "Err: 10", err)
-	tests.Assert(t, last == 10)
+	tests.Assert(t, err.Error() == "ERROR")
 }
 
 func TestResultFailFast(t *testing.T) {
 	s := NewStatusGroup()
-	var last int
+
+	wait := make(chan bool)
+	go func() {
+		wait <- true
+		s.Err(fmt.Errorf("ERROR"))
+	}()
+	<-wait
 
 	for i := 1; i < 100; i++ {
 
@@ -116,16 +141,12 @@ func TestResultFailFast(t *testing.T) {
 			time.Sleep(time.Millisecond * 1 * time.Duration(value))
 			if value%10 == 0 {
 				s.Err(errors.New(fmt.Sprintf("Err: %v", value)))
-				last = value
 			}
-
 		}(i)
 
 	}
 
 	err := s.ResultFailFast()
-
 	tests.Assert(t, err != nil)
-	tests.Assert(t, err.Error() == "Err: 10", err)
-	tests.Assert(t, last == 10)
+	tests.Assert(t, err.Error() == "ERROR")
 }
