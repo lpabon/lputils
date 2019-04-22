@@ -10,7 +10,7 @@ APIs available:
     * statusgroup.go
 * JSON Helper Functions:
     * bodystring.go
-	* jsonutils.go
+    * jsonutils.go
 * sort.StringSlice Helper functions:
     * sortedstrings.go
 * UUID 16 bytes:
@@ -21,7 +21,9 @@ APIs available:
     * asynchttp/
 * Super simple Unit Test assert:
     * tests/assert.go
-	* tests/patch.go
+    * tests/patch.go
+* Workers producer/consumer helper function
+    * workers/
 
 # Licensing
 
