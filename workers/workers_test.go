@@ -10,11 +10,11 @@ import (
 func TestWorkers(t *testing.T) {
 	sum := int64(0)
 
-	Workers(10, func(v interface{}) {
+	Workers(10, func(v any) {
 		// consumer
 		i := v.(int64)
 		atomic.AddInt64(&sum, i)
-	}, func(ch chan interface{}) {
+	}, func(ch chan<- any) {
 		//producer
 		for p := int64(0); p < int64(100); p++ {
 			ch <- p

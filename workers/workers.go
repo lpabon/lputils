@@ -1,4 +1,3 @@
-//
 // Copyright (c) 2019 Luis Pabón <lpabon@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 package workers
 
 import (
@@ -23,8 +21,8 @@ import (
 // consumers for the content created by the producer closure. What is placed
 // in the channel `ch` by the producer will be passed to the consumer function
 // as the argument.
-func Workers(numWorkers int, consumerf func(interface{}), producerf func(chan interface{})) {
-	ch := make(chan interface{})
+func Workers(numWorkers int, consumerf func(any), producerf func(chan<- any)) {
+	ch := make(chan any)
 	var wg sync.WaitGroup
 
 	// Start workers
